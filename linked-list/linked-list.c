@@ -97,6 +97,9 @@ int pop_front(List *l) {
   l->head = tmp->next;
   free(tmp);
   l->size--;
+  if(l->size == 0){ // quick dirty fix
+    l->tail = 0x0;
+  }
   return value;
 }
 
@@ -205,6 +208,9 @@ void erase(List *l, int index){
     return;
   }
 
+  if(index == l->size -1){ // quick fix
+    l->tail = prev;
+  }
 
   if(prev != 0x0){
     prev->next = cur->next;
@@ -305,6 +311,18 @@ void remove_value(List *l, int value){
 
 /////////// tests ///////////////
 
+void custom_test(){
+  List l = new(0x0, 0x0);
+  insert(&l, 0, 123);
+  print(&l);
+  insert(&l, 1, 23);
+  print(&l);
+  /* erase(&l, 1); */
+  /* erase(&l, 0); */
+  /* assert(l.tail == 0x0); */
+  print(&l);
+}
+
 void test_all(){
   test_value_at();
   test_push_front();
@@ -319,6 +337,7 @@ void test_all(){
   test_value_n_from_end();
   test_reverse();
   test_remove_value();
+  custom_test();
 }
 
 
