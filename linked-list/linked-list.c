@@ -46,23 +46,7 @@ List copy_list(List *source, uint32_t index_start, uint32_t index_end){
     cur_index++;
   }
 
-
-
-  /* l->head = copy(head); */
-  /* l->tail = copy(tail); */
-
-  /* Node *cur = head->next; */
-  /* Node *cur_in_list = l->head; */
-  /* while(cur != l->tail && cur != 0x0){ */
-  /*   Node *tmp = copy(cur); */
-  /*   cur_in_list->next = tmp; */
-  /*   cur = cur->next; */
-  /*   cur_in_list = cur_in_list->next; */
-  /* } */
-  /* if(l->tail != 0x0){ */
-  /*   l->tail->next = 0x0; // we want to cut off the list if it was created from only a part of a bigger list */
-  /* } */
-  return *l;
+ return *l;
 }
 
 List new(){
