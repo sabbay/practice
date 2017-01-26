@@ -9,26 +9,35 @@
 typedef uint8_t bool;
 typedef struct Node Node;
 
+typedef struct {
+  Node *head;
+  Node *tail;
+  uint32_t size;
+}List;
+
 struct Node{
   int value;
   Node *next;
-}Head;
+};
 
-uint16_t size(Node *head); 
-bool empty(Node *head);
-int value_at(Node *head, int index);
-void push_front(Node **head, int value);
-int pop_front(Node **head);
-void push_back(Node **head,int value);
-int pop_back(Node **head);
-int front(Node *head);
-int back(Node *head);
-void insert(Node **head, int index, int value);
-void erase(Node **head, int index);
-int value_n_from_end(Node *head, int n);
-void reverse(Node **head);
-void remove_value(Node **head, int value);
-void print(Node *head);
+List new();
+Node *copy_node(Node *node);
+List copy_list(List *source, uint32_t index_start, uint32_t index_end);
+uint16_t size(List *l);
+bool empty(List *l);
+int value_at(List *l, int index);
+void push_front(List *l, int value);
+int pop_front(List *l);
+void push_back(List *l,int value);
+int pop_back(List *l);
+int front(List *l);
+int back(List *l);
+void insert(List *l, int index, int value);
+void erase(List *l, int index);
+int value_n_from_end(List *l, int n);
+void reverse(List *l);
+void remove_value(List *l, int value);
+void print(List *l);
 
 void test_all();
 void test_empty();
@@ -45,6 +54,7 @@ void test_erase();
 void test_value_n_from_end();
 void test_reverse();
 void test_remove_value();
+void test_copy_list();
 
 
 #endif /* LINKED-LIST_H */

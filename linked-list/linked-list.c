@@ -6,15 +6,70 @@
 
 
 
-List new(Node *head, Node *tail){
-  List *l = calloc(1, sizeof(List));
-  l->head = head;
-  l->tail = tail;
-  if(l->tail != 0x0){
-    l->tail->next = 0x0; // we want to cut off the list if it was created from only a part of a bigger list
+Node* copy_node(Node* node) {
+  if(node == 0x0){
+    return 0x0;
   }
+  Node *new = calloc(1, sizeof(Node));
+  new->value = node->value;
+  return new;
+}
+
+List copy_list(List *source, uint32_t index_start, uint32_t index_end){
+  List *l = calloc(1, sizeof(List));
+  uint32_t cur_index = 0;
+
+  if(index_start < 0 || index_start > index_end || index_end > source->size -1){
+    printf("cannot copy, invalid index");
+    exit(-1);
+  }
+
+  Node *cur;
+  cur = source->head;
+
+  while(cur_index < index_start){
+    cur = cur->next;
+    cur_index++;
+  }
+
+  l->head = copy_node(cur);
+  Node *cur_list= l->head;
+
+  while(cur_index < index_end){
+    printf("currently copying with value %d\n", cur->value);
+    cur = cur->next;
+    cur_list->next = copy_node(cur);
+    if(cur_index == index_end){
+      l->tail = cur_list;
+    }
+    cur_list = cur_list->next;
+    cur_index++;
+  }
+
+
+
+  /* l->head = copy(head); */
+  /* l->tail = copy(tail); */
+
+  /* Node *cur = head->next; */
+  /* Node *cur_in_list = l->head; */
+  /* while(cur != l->tail && cur != 0x0){ */
+  /*   Node *tmp = copy(cur); */
+  /*   cur_in_list->next = tmp; */
+  /*   cur = cur->next; */
+  /*   cur_in_list = cur_in_list->next; */
+  /* } */
+  /* if(l->tail != 0x0){ */
+  /*   l->tail->next = 0x0; // we want to cut off the list if it was created from only a part of a bigger list */
+  /* } */
   return *l;
 }
+
+List new(){
+  List *l = calloc(1, sizeof(List));
+  return *l;
+}
+
 
 void print(List *l) {
   int index=0;
@@ -33,6 +88,7 @@ void print(List *l) {
   printf("size %d   head %x   tail %x", l->size, l->head, l->tail);
   printf("\n");
 }
+
 
 
 bool empty(List *l) {
@@ -312,7 +368,7 @@ void remove_value(List *l, int value){
 /////////// tests ///////////////
 
 void custom_test(){
-  List l = new(0x0, 0x0);
+  List l = new();
   insert(&l, 0, 123);
   print(&l);
   insert(&l, 1, 23);
@@ -338,11 +394,25 @@ void test_all(){
   test_reverse();
   test_remove_value();
   custom_test();
+  test_copy_list();
+}
+
+
+void test_copy_list(){
+  List l = new();
+  push_back(&l, 10);
+  push_back(&l, 11);
+  push_back(&l, 12);
+  push_back(&l, 13);
+  push_back(&l, 14);
+  List kek = copy_list(&l, 1, 3);
+  print(&l);
+  print(&kek);
 }
 
 
 void test_remove_value(){
-  List l = new(0x0, 0x0);
+  List l = new();
   push_back(&l, 2);
   push_back(&l, 2);
   
@@ -363,7 +433,7 @@ void test_remove_value(){
 }
 
 void test_reverse(){
-  List l = new(0x0, 0x0);
+  List l = new();
   push_back(&l, 1);
   reverse(&l);
   assert(l.size == size(&l));
@@ -378,7 +448,7 @@ void test_reverse(){
 }
 
 void test_erase(){
-  List l = new(0x0, 0x0);
+  List l = new();
   push_back(&l, 1);
   erase(&l, 0);
   assert(l.size == size(&l));
@@ -403,7 +473,7 @@ void test_erase(){
 }
 
 void test_insert(){
-  List l = new(0x0, 0x0);
+  List l = new();
   insert(&l, 0, 10);
   
   assert(value_at(&l, 0) == 10);
@@ -421,7 +491,7 @@ void test_insert(){
 }
 
 void test_back(){
-  List l = new(0x0, 0x0);
+  List l = new();
   push_back(&l, 5);
   push_back(&l, 4);
   assert(l.size == size(&l));
@@ -429,7 +499,7 @@ void test_back(){
 }
 
 void test_front(){
-  List l = new(0x0, 0x0);
+  List l = new();
   push_front(&l, 5);
   push_front(&l, 4);
   assert(l.size == size(&l));
@@ -437,7 +507,7 @@ void test_front(){
 }
 
 void test_pop_back(){
-  List l = new(0x0, 0x0);
+  List l = new();
   push_back(&l, 5);
   push_back(&l, 3);
   push_back(&l, 2);
@@ -455,7 +525,7 @@ void test_pop_back(){
 }
 
 void test_push_back(){
-  List l = new(0x0, 0x0);
+  List l = new();
   push_back(&l, 10);
   push_back(&l, 11);
   push_back(&l, 12);
@@ -471,7 +541,7 @@ void test_push_back(){
 }
 
 void test_pop_front(){
-  List l = new(0x0, 0x0);
+  List l = new();
   push_front(&l, 10);
   assert(l.size == size(&l));
   
@@ -481,7 +551,7 @@ void test_pop_front(){
 }
 
 void test_value_at(){
-  List l = new(0x0, 0x0);
+  List l = new();
   push_front(&l, 5);
   assert(value_at(&l, 0) == 5);
   push_front(&l, 6);
@@ -492,7 +562,7 @@ void test_value_at(){
 }
 
 void test_push_front(){
-   List l = new(0x0, 0x0);
+   List l = new();
    push_front(&l, 1);
    push_front(&l, 2);
    push_front(&l, 3);
@@ -510,7 +580,7 @@ void test_push_front(){
 }
 
 void test_empty(){
-  List l = new(0x0, 0x0);
+  List l = new();
   assert( empty(&l) == TRUE);
   assert(l.size == size(&l));
   push_front(&l, 5);
@@ -520,7 +590,7 @@ void test_empty(){
 
 
 void test_value_n_from_end() {
-  List l = new(0x0, 0x0);
+  List l = new();
   push_back(&l, 1);
   push_back(&l, 2);
   assert(l.size == size(&l));
