@@ -25,6 +25,21 @@ void remove_element(Heap *heap, int index){
   extract_max(heap);
 }
 
+
+
+int *heap_sort(int *array,int size , bool ascending){
+  Heap h = create_heap(array, size, size);
+  max_heapify(&h);
+  for(int i = 0; i < h.capacity; i++ ){
+    extract_max(&h);
+  }
+  int *result = calloc(size, sizeof(int));
+  for(int i = 0; i < size; i++){
+    result[i] = h.array[i];
+  }
+  return result;
+}
+
 void change_priority(Heap* heap, int index, int new_priority) {
   if(index >= heap->size){
     printf("Invalid index");
@@ -44,6 +59,9 @@ int get_max(Heap *heap){
 }
 
 int extract_max(Heap *heap){
+  if(heap->size == 0){
+    exit(-1);
+  }
   if(heap->size == 1){
     heap->size--;
     return heap->array[0];
@@ -57,27 +75,25 @@ int extract_max(Heap *heap){
 }
 
 void sift_down(int index, Heap *heap){
-  fflush(stdout);
   if(is_leaf(index, heap->size)){
     return;
   }else if(right_index(index, heap->size) == -1){ // has only one child, and after swapping will become leaf
-    if(*left_node(index, heap) > heap->array[index]){
+    if(*left_node(index, heap) >= heap->array[index]){
       swap(index, left_index(index, heap->size), heap->array);
     }else{
       return;
     }
   }else{// has two children
     if( // left child is the greatest
-       *left_node(index, heap) > *right_node(index, heap) &&
-       *left_node(index, heap) > heap->array[index]
+       *left_node(index, heap) >= *right_node(index, heap) &&
+       *left_node(index, heap) >= heap->array[index]
        ){
       swap(index, left_index(index, heap->size), heap->array);
       sift_down(left_index(index, heap->size), heap);
     }
-    fflush(stdout);
-    if( // right child is the greatest
-       *right_node(index, heap) > * left_node(index, heap) &&
-       *right_node(index, heap) > heap->array[index]
+    else if( // right child is the greatest
+       *right_node(index, heap) >= * left_node(index, heap) &&
+       *right_node(index, heap) >= heap->array[index]
              ){
       swap(index, right_index(index, heap->size), heap->array);
       sift_down(right_index(index, heap->size), heap);
@@ -126,7 +142,7 @@ void sift_up(int index, Heap *heap){
     swap(index, 0, heap->array);
   }
   else{
-    if(*parent_node(index, heap) < heap->array[index]){
+    if(*parent_node(index, heap) <= heap->array[index]){
       swap(parent_index(index), index, heap->array);
       sift_up(parent_index(index), heap);
     }
@@ -170,25 +186,34 @@ void __max_heapify(Heap *heap, int root_index) {
   if(is_leaf(root_index, heap->size)){
     return; // a leaf is already a heap
   }
-  if(right_node(root_index, heap) != 0x0  &&
-     *right_node(root_index, heap) > heap->array[root_index] &&
-     *right_node(root_index, heap) > *left_node(root_index, heap)
-     ){ // if right child is greatest
-    swap(root_index, right_index(root_index, heap->size), heap->array);
-    __max_heapify(heap, right_index(root_index, heap->size));
-  }else if(left_node(root_index, heap) != 0x0 &&
-           *left_node(root_index, heap) > heap->array[root_index] &&
-           *left_node(root_index, heap) > *right_node(root_index, heap)
-           ){ // if left child is greatest
-    swap(root_index, left_index(root_index, heap->size), heap->array);
-    __max_heapify(heap, left_index(root_index, heap->size));
-  }else{ // is already heapified
-    return;
+  else if(right_index(root_index, heap->size) == -1){ // has one child (left one)
+    if(*left_node(root_index, heap) >= heap->array[root_index]){
+      swap(root_index, left_index(root_index, heap->size), heap->array);
+      __max_heapify(heap, left_index(root_index, heap->size));
+    }else{
+      return;
+    }
+  }else{ // has two children
+    if( // if right child is greatest
+       *right_node(root_index, heap) >= heap->array[root_index] &&
+       *right_node(root_index, heap) >= *left_node(root_index, heap)
+        ){
+      swap(root_index, right_index(root_index, heap->size), heap->array);
+      __max_heapify(heap, right_index(root_index, heap->size));
+    }else if(// if left child is greatest
+             *left_node(root_index, heap) >= heap->array[root_index] &&
+             *left_node(root_index, heap) >= *right_node(root_index, heap)
+             ){
+      swap(root_index, left_index(root_index, heap->size), heap->array);
+      __max_heapify(heap, left_index(root_index, heap->size));
+    }else{ // is already heapified
+      return;
+    }
   }
 }
 
 int left_index(int index, int size){
-  if(2*index +1 > size){
+  if(2*index +1 >= size){
     return -1;
   }
   return 2*index +1;
@@ -202,7 +227,7 @@ int *left_node(int index,Heap *heap){
 }
 
 int right_index(int index, int size){
-  if(2*index +2 > size){
+  if(2*index +2 >= size){
     return -1;
   }
   return 2*index + 2;
@@ -280,6 +305,13 @@ void test_extract(){
   assert(memcmp(heap.array, result, heap.size) == 0);
   assert(extract_max(&heap) == 80);
   assert(heap.size == 7);
+  assert(extract_max(&heap) == 70);
+  assert(extract_max(&heap) == 60);
+  assert(extract_max(&heap) == 50);
+  assert(extract_max(&heap) == 40);
+  assert(extract_max(&heap) == 30);
+  assert(extract_max(&heap) == 20);
+  assert(extract_max(&heap) == 10);
 }
 
 void test_insert(){

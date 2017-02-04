@@ -47,6 +47,7 @@ bool is_empty(Heap *heap);
 int extract_max(Heap *heap);
 void change_priority(Heap *heap, int index, int new_priority);
 void remove_element(Heap *heap, int index);
+int *heap_sort(int *array,int size , bool ascending);// otherwise descending
 
 
 
